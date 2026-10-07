@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+    int in = 0;
+    if (pid == 0) {
+        printf("inserisci il codice da ritornare\n");
+        scanf("%d", &in);
+        exit(in); 
+    } else {
+        int status;
+        pid_t child_pid = wait(&status);
+
+        if (WIFEXITED(status)) {
+            int exit_code = WEXITSTATUS(status);
+            
+            int c = 0;
+            
+            if (exit_code <= 1) {}
+            else {
+                for (int i = 1; i <= exit_code; i++) {
+                    if (exit_code % i == 0)
+                        c++;
+                }
+        
+                if (c == 2){
+                    printf("%d è primo ", exit_code);
+                    exit(1);
+                }
+                else if (exit_code % 2 == 0){
+                    printf("%d è pari ", exit_code);
+                    exit(2);
+                } else {
+                    printf("%d è dispari ", exit_code);
+                    exit(3);
+                }
+                    
+            }
+            
+        } else {
+            printf("Il figlio è terminato in modo anomalo.\n");
+        }
+    }
+
+    return 0;
+}
