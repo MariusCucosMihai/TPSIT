@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main()
+{
+    int figli = 3;
+    
+    for(int i = 0; i < figli; i++){
+        pid_t p = fork();
+        
+        if(p < 0){
+            printf("ERRORE!");
+            exit(-1);
+        }
+        if (p == 0){
+            printf("figlio %d con pid %d \n", i + 1, getpid());
+            sleep(2);
+            printf("figlio %d pid %d terminato \n", i + 1, getpid());
+            exit(0);
+        }
+        
+    }
+    
+    for (int i = 0; i < figli; i++)
+        wait(NULL);
+    
+    printf("processo padre chiude");
+
+    return 0;
+}
