@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <math.h>
+
+int main() {
+
+	int fd[2];
+	
+	int MAX = 10;
+	
+	int arr[] = {1, 2, 1, 2, 1, 2, 1, 2, 1, 2};
+
+	if (pipe(fd) == -1) {
+		fprintf(stderr, "error pipe");
+		exit(-1);
+	}
+
+	pid_t ritorno = fork();
+
+	if(ritorno == -1) {
+		fprintf(stderr, "errore fork");
+		exit(-2);
+	}
+
+	if(!ritorno) {
+		//sleep(5);
+
+		close(fd[0]);
+
+		int s = 0;
+		for (int i = 0; i < MAX; i++){
+		    if (arr[i] % 2 == 0)
+		        s += arr[i];
+		}
+
+
+		write(fd[1], &s, sizeof(s));
+
+		close(fd[1]);
+
+		exit(0);
+	}
+	close(fd[1]);
+	
+	
+	int s = 0;
+	for (int i = 0; i < MAX; i++){
+	    if (arr[i] % 2 != 0)
+	        s += arr[i];
+	}
+	printf("somma parziale n pari %d \n", s);
+	
+	char sommaPari;
+	int bytes_letti = read(fd[0], &sommaPari, sizeof(sommaPari));
+
+	printf("somma parziale n dispari %d \n", sommaPari);
+
+	close(fd[0]);
+	
+	wait(NULL);
+	
+	printf("somma totale %d", s + sommaPari);
+
+
+	return 0;
+}
